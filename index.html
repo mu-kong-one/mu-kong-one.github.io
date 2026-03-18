@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>致最特别的你</title>
+    <style>
+        /* 全局样式：设置背景和字体 */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden; /* 隐藏横向滚动条 */
+            background: linear-gradient(to bottom, #2c3e50, #4a69bd, #e66b7e); /* 浪漫渐变背景 */
+            color: #fff;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+
+        /* 粒子画布：覆盖在最上层 */
+        #canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none; /* 让点击穿透 */
+        }
+
+        /* 内容容器 */
+        .container {
+            position: relative;
+            z-index: 2; /* 内容在粒子之上 */
+            width: 80%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 50px 20px;
+            text-align: center;
+        }
+
+        /* 标题样式 */
+        h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            animation: fadeInDown 2s;
+        }
+
+        /* 副标题 */
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.8;
+            margin-bottom: 50px;
+            font-style: italic;
+        }
+
+        /* 照片墙区域 */
+        .photo-section {
+            margin-top: 50px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+
+        .photo-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            backdrop-filter: blur(5px); /* 毛玻璃效果 */
+            transition: transform 0.5s;
+        }
+
+        .photo-card:hover {
+            transform: scale(1.02);
+        }
+
+        /* 占位图片样式 */
+        .placeholder-img {
+            width: 100%;
+            height: 300px;
+            background: #eee;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+            font-size: 1.5em;
+            border-radius: 5px;
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* 文字说明 */
+        .desc {
+            margin-top: 15px;
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+
+        /* 动画定义 */
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 脚注 */
+        .footer {
+            margin-top: 100px;
+            font-size: 0.9em;
+            opacity: 0.6;
+            padding-bottom: 50px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 粒子画布 -->
+    <canvas id="canvas"></canvas>
+
+    <!-- 主要内容 -->
+    <div class="container">
+        <h1 id="title">亲爱的</h1>
+        <div class="subtitle">这是一个只属于我们的数字空间</div>
+
+        <div class="photo-section">
+            <!-- 第一张照片 -->
+            <div class="photo-card">
+                <div class="placeholder-img" style="background-image: url('https://picsum.photos/800/400?random=1');">
+                    <!-- 这里替换成你的图片地址 -->
+                </div>
+                <div class="desc">
+                    <p>第一次相遇，代码开始运行...</p>
+                </div>
+            </div>
+
+            <!-- 第二张照片 -->
+            <div class="photo-card">
+                <div class="placeholder-img" style="background-image: url('https://picsum.photos/800/400?random=2');">
+                    <!-- 这里替换成你的图片地址 -->
+                </div>
+                <div class="desc">
+                    <p>我们的故事，是一个无限循环。</p>
+                </div>
+            </div>
+            
+            <!-- 第三张照片 -->
+            <div class="photo-card">
+                <div class="placeholder-img" style="background-image: url('https://picsum.photos/800/400?random=3');">
+                    <!-- 这里替换成你的图片地址 -->
+                </div>
+                <div class="desc">
+                    <p>余生请多指教。</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            Made with Code & Love <br>
+            Forever Yours
+        </div>
+    </div>
+
+    <!-- 脚本：控制粒子特效 -->
+    <script>
+        // 简单的爱心粒子逻辑
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        let width, height;
+        let particles = [];
+        
+        // 设置画布大小
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        
+        // 粒子类
+        class Particle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.size = Math.random() * 3 + 1;
+                this.speedX = Math.random() * 2 - 1; // 左右飘动
+                this.speedY = Math.random() * 1 + 0.5; // 向下飘落
+                this.color = `rgba(255, ${Math.floor(Math.random() * 100 + 155)}, ${Math.floor(Math.random() * 150)}, 0.8)`;
+            }
+            
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                
+                // 如果超出屏幕，重置到顶部
+                if (this.y > height) {
+                    this.y = 0;
+                    this.x = Math.random() * width;
+                }
+                if (this.x > width || this.x < 0) {
+                     this.x = Math.random() * width;
+                }
+            }
+            
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+        }
+        
+        function init() {
+            resize();
+            particles = [];
+            for (let i = 0; i < 80; i++) { // 粒子数量
+                particles.push(new Particle());
+            }
+        }
+        
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+                
+                // 绘制连线（浪漫网状效果）
+                for (let j = i; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < 100) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = `rgba(255, 255, 255, ${0.1 - distance/1000})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            
+            requestAnimationFrame(animate);
+        }
+        
+        window.addEventListener('resize', resize);
+        init();
+        animate();
+
+        // 打字机效果（可选，简单的标题动画）
+        const title = document.getElementById('title');
+        // 这里可以添加更复杂的打字机逻辑，这里用CSS动画代替了
+    </script>
+</body>
+</html>
